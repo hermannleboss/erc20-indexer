@@ -5,25 +5,62 @@ import {
   Flex,
   Heading,
   Image,
-  Input,
   SimpleGrid,
   Text,
 } from '@chakra-ui/react';
 import { Alchemy, Network, Utils } from 'alchemy-sdk';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 
 function App() {
   const [userAddress, setUserAddress] = useState('');
   const [results, setResults] = useState([]);
   const [hasQueried, setHasQueried] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
+// Wallet connection logic
+  const isWalletConnected = async () => {
+    try {
+      const { ethereum } = window;
+
+      const accounts = await ethereum.request({ method: 'eth_accounts' })
+
+      if (accounts.length > 0) {
+        const account = accounts[0];
+        console.log("wallet is connected! " + account);
+      } else {
+        console.log("make sure MetaMask is connected");
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
+
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        console.log("please install MetaMask");
+      }
+
+      const accounts = await ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+
+      setUserAddress(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(()=>{
+    isWalletConnected();
+  }, [])
 
   async function getTokenBalance() {
     const config = {
       apiKey: import.meta.env.VITE_API_KEY,
       network: Network.ETH_MAINNET,
     };
-    console.log(config.apiKey)
 
     const alchemy = new Alchemy(config);
     const data = await alchemy.core.getTokenBalances(userAddress);
@@ -68,15 +105,8 @@ function App() {
         <Heading mt={42}>
           Get all the ERC-20 token balances of this address:
         </Heading>
-        <Input
-          onChange={(e) => setUserAddress(e.target.value)}
-          color="black"
-          w="600px"
-          textAlign="center"
-          p={4}
-          bgColor="white"
-          fontSize={24}
-        />
+        {userAddress ? (<div>{userAddress}</div>) : (<button onClick={connectWallet}> Connect your wallet </button>)}
+
         <Button fontSize={20} onClick={getTokenBalance} mt={36} bgColor="blue">
           Check ERC-20 Token Balances
         </Button>
