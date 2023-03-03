@@ -5,7 +5,8 @@ This is an skeleton app that uses the Alchemy SDK rigged to Alchemy's Enhanced A
 ## Set Up
 
 1. Install dependencies by running `npm install`
-2. Start application by running `npm run dev`
+2. Copy .env into .env.local and setup you API KEY `cp .env .env.local`
+3. Start application by running `npm run dev`
 
 ## Challenge
 
