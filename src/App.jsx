@@ -20,9 +20,10 @@ function App() {
 
   async function getTokenBalance() {
     const config = {
-      apiKey: '<-- COPY-PASTE YOUR ALCHEMY API KEY HERE -->',
+      apiKey: import.meta.env.VITE_API_KEY,
       network: Network.ETH_MAINNET,
     };
+    console.log(config.apiKey)
 
     const alchemy = new Alchemy(config);
     const data = await alchemy.core.getTokenBalances(userAddress);
