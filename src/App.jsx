@@ -1,12 +1,12 @@
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Image,
-  SimpleGrid,
-  Text,
+    Box,
+    Button,
+    Center,
+    Flex,
+    Heading,
+    Image,
+    SimpleGrid, Spinner, Stack,
+    Text,
 } from '@chakra-ui/react';
 import { Alchemy, Network, Utils } from 'alchemy-sdk';
 import {useEffect, useState} from 'react';
@@ -14,6 +14,7 @@ import {useEffect, useState} from 'react';
 function App() {
   const [userAddress, setUserAddress] = useState('');
   const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
 // Wallet connection logic
@@ -61,9 +62,9 @@ function App() {
       apiKey: import.meta.env.VITE_API_KEY,
       network: Network.ETH_MAINNET,
     };
-
+    setIsLoading(true);
     const alchemy = new Alchemy(config);
-    const data = await alchemy.core.getTokenBalances(userAddress);
+    const data = await alchemy.core.getTokenBalances(userAddress)
 
     setResults(data);
 
@@ -77,6 +78,8 @@ function App() {
     }
 
     setTokenDataObjects(await Promise.all(tokenDataPromises));
+
+    setIsLoading(false)
     setHasQueried(true);
   }
   return (
@@ -111,8 +114,12 @@ function App() {
           Check ERC-20 Token Balances
         </Button>
 
-        <Heading my={36}>ERC-20 token balances:</Heading>
-
+        <Heading my={36}>ERC-20 token balances: </Heading>
+          {isLoading ? (
+              <Stack direction='row'  h="32px" >
+              <Spinner size='xl' />
+                </Stack>
+          ): (<div></div>)}
         {hasQueried ? (
           <SimpleGrid w={'90vw'} columns={4} spacing={24}>
             {results.tokenBalances.map((e, i) => {
@@ -122,10 +129,10 @@ function App() {
                   color="white"
                   bg="blue"
                   w={'20vw'}
-                  key={e.id}
+                  key={i}
                 >
                   <Box>
-                    <b>Symbol:</b> ${tokenDataObjects[i].symbol}&nbsp;
+                    <b> Symbol:</b> ${tokenDataObjects[i].symbol}&nbsp;
                   </Box>
                   <Box>
                     <b>Balance:</b>&nbsp;
